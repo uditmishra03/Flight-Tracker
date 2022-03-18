@@ -1,13 +1,18 @@
 import requests
 from data_manager import DataManager
 
-
-
 TEQUILA_API_KEY = "b9Lpp3coo06X2pa09KI_hpRr3PvBB36n"
 
+
 class FlightData:
-    #This class is responsible for structuring the flight data.
-    def __init__(self):
-        self.price= 0
-        self.departure_airport_code = None
-        self.departure_city = None
+    # This class is responsible for structuring the flight data.
+    def __init__(self, price, origin_city,
+                 origin_airport, destination_city,
+                 destination_airport, out_date, return_date):
+        self.price = price
+        self.origin_city = origin_city
+        self.origin_airport = origin_airport
+        self.destination_city = destination_city
+        self.destination_airport = destination_airport
+        self.out_date = out_date
+        self.return_date = return_date

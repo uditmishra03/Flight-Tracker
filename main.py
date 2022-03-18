@@ -5,11 +5,7 @@ from pprint import pprint
 from flight_search import FlightSearch
 from data_manager import DataManager
 
-
-# APP_ID =
-
-# BEARER_TOKEN = 
-SHEET_ENDPOINT = "https://api.sheety.co/d1c958dac821bf9335d44477eb417876/flightDeals/prices"
+SHEET_ENDPOINT = "https://api.sheety.co/ecf356f482c483019bec99c1e7e46d1a/flightDeals/prices"
 
 # Creating objects of imported classes.
 flightSearch = FlightSearch()
@@ -28,5 +24,3 @@ for data in sheet_data:
         data['iataCode'] = flightSearch.get_destination_code(data['city'])
 datamanager.update_destination_data()
 flightSearch.check_flight()
-
-

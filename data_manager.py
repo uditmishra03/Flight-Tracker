@@ -1,6 +1,6 @@
 import requests
 
-SHEET_ENDPOINT = "https://api.sheety.co/d1c958dac821bf9335d44477eb417876/flightDeals/prices"
+SHEET_ENDPOINT = "https://api.sheety.co/ecf356f482c483019bec99c1e7e46d1a/flightDeals/prices"
 
 
 class DataManager:
@@ -22,4 +22,4 @@ class DataManager:
             }
             update_endpoint = f"{SHEET_ENDPOINT}/{each['id']}"
             response = requests.put(url=update_endpoint, json=new_data)
-            # print(response.text)
+            print(response.text)

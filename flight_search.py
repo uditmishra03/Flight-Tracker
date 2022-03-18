@@ -1,9 +1,11 @@
 import requests
 from datetime import datetime, timedelta
 from data_manager import DataManager
+from flight_data import FlightData
 
 TEQUILA_API_KEY = "b9Lpp3coo06X2pa09KI_hpRr3PvBB36n"
 ORIGIN_CITY = "LON"
+
 
 class FlightSearch:
     # This class is responsible for talking to the Flight Search API.
@@ -54,13 +56,20 @@ class FlightSearch:
                 params=self.params,
             )
             try:
-                self.flight_data = self.response.json()
-                # self.price_list = [self.price_list['cityTo']:self.price_list['price'] for (key, value) in self.flight_data['data'][0].items()]
-                self.price_list = {}
+                data = self.response.json()["data"][0]
 
-                self.price_list[self.flight_data['data'][0]['cityTo']] = self.flight_data['data'][0]['price']
-                print(self.price_list)
             except IndexError:
                 print(f"No flights found for {each_row['iataCode']}.")
                 return None
 
+            flight_data = FlightData(
+                price=data["price"],
+                origin_city=data["route"][0]["cityFrom"],
+                origin_airport=data["route"][0]["flyFrom"],
+                destination_city=data["route"][0]["cityTo"],
+                destination_airport=data["route"][0]["flyTo"],
+                out_date=data["route"][0]["local_departure"].split("T")[0],
+                return_date=data["route"][1]["local_departure"].split("T")[0]
+            )
+            print(f"{flight_data.destination_city}: £{flight_data.price}")
+            return flight_data
