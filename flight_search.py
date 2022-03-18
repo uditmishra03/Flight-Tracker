@@ -1,9 +1,10 @@
+import os
 import requests
 from datetime import datetime, timedelta
 from data_manager import DataManager
 from flight_data import FlightData
 
-TEQUILA_API_KEY = "b9Lpp3coo06X2pa09KI_hpRr3PvBB36n"
+TEQUILA_API_KEY = os.environ.get("TEQUILA_API_KEY")
 ORIGIN_CITY = "LON"
 
 
@@ -26,7 +27,7 @@ class FlightSearch:
         code = response.json()['locations'][0]['code']
         return code
 
-    def check_flight(self):
+    def check_flight(self, destination_code):
         self.sheet_data = self.datamanager.get_destination_data()
         self.flight_search_url = "https://tequila-api.kiwi.com/v2/search?"
         self.date_from = datetime.now() + timedelta(days=1)
@@ -35,41 +36,41 @@ class FlightSearch:
         self.header = {
             "apikey": TEQUILA_API_KEY,
         }
-        for each_row in self.sheet_data:
-            self.params = {
-                "fly_from": ORIGIN_CITY,
-                "fly_to": each_row['iataCode'],
-                "date_from": self.date_from.strftime('%d/%m/%Y'),
-                "date_to": self.till_date.strftime('%d/%m/%Y'),
-                "flight_type": "round",
-                "nights_in_dst_from": 7,
-                "nights_in_dst_to": 28,
-                "curr": "GBP",
-                "max_stopovers": 0,
-                "one_for_city": 1,
+        # for each_row in self.sheet_data:
+        self.params = {
+            "fly_from": ORIGIN_CITY,
+            "fly_to": destination_code,
+            "date_from": self.date_from.strftime('%d/%m/%Y'),
+            "date_to": self.till_date.strftime('%d/%m/%Y'),
+            "flight_type": "round",
+            "nights_in_dst_from": 7,
+            "nights_in_dst_to": 28,
+            "curr": "GBP",
+            "max_stopovers": 0,
+            "one_for_city": 1,
 
-            }
+        }
 
-            self.response = requests.get(
-                url=f"{self.flight_search_url}",
-                headers=self.header,
-                params=self.params,
-            )
-            try:
-                data = self.response.json()["data"][0]
+        self.response = requests.get(
+            url=f"{self.flight_search_url}",
+            headers=self.header,
+            params=self.params,
+        )
+        try:
+            data = self.response.json()["data"][0]
 
-            except IndexError:
-                print(f"No flights found for {each_row['iataCode']}.")
-                return None
+        except IndexError:
+            print(f"No flights found for {destination_code}.")
+            return None
 
-            flight_data = FlightData(
-                price=data["price"],
-                origin_city=data["route"][0]["cityFrom"],
-                origin_airport=data["route"][0]["flyFrom"],
-                destination_city=data["route"][0]["cityTo"],
-                destination_airport=data["route"][0]["flyTo"],
-                out_date=data["route"][0]["local_departure"].split("T")[0],
-                return_date=data["route"][1]["local_departure"].split("T")[0]
-            )
-            print(f"{flight_data.destination_city}: £{flight_data.price}")
-            return flight_data
+        flight_data = FlightData(
+            price=data["price"],
+            origin_city=data["route"][0]["cityFrom"],
+            origin_airport=data["route"][0]["flyFrom"],
+            destination_city=data["route"][0]["cityTo"],
+            destination_airport=data["route"][0]["flyTo"],
+            out_date=data["route"][0]["local_departure"].split("T")[0],
+            return_date=data["route"][1]["local_departure"].split("T")[0]
+        )
+        # print(f"{flight_data.destination_city}: £{flight_data.price}")
+        return flight_data

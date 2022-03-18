@@ -1,7 +1,6 @@
-import requests
-from data_manager import DataManager
+import os
 
-TEQUILA_API_KEY = "b9Lpp3coo06X2pa09KI_hpRr3PvBB36n"
+TEQUILA_API_KEY = os.environ.get("TEQUILA_API_KEY")
 
 
 class FlightData:
