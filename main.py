@@ -22,15 +22,27 @@ if sheet_data[0]["iataCode"] == "":
 
 for destination in sheet_data:
     flight = flightsearch.check_flight(destination["iataCode"])
+    if flight is None:
+        continue
     try:
         if flight.price < destination['lowestPrice']:
-            message = f"Low price alert! On ₤{flight.price} to fly from " \
-                      f"{flight.origin_city}-{flight.origin_airport}" \
-                      f"to {flight.destination_city}-{flight.destination_airport}," \
+            users = datamanager.get_customer_emails()
+            emails = [row["email"] for row in users]
+            names = [row["firstName"] for row in users]
+
+            message = f"Low price alert! Only £{flight.price} to fly from {flight.origin_city}" \
+                      f"-{flight.origin_airport} to {flight.destination_city}-{flight.destination_airport}," \
                       f" from {flight.out_date} to {flight.return_date}."
-            notificationmanager.send_sms(message)
+
+            if flight.stop_overs > 0:
+                message += f"\nFlight has {flight.stop_overs} stop over, via {flight.via_city}."
+
+            link = f"https://www.google.co.uk/flights?hl=en#flt={flight.origin_airport}." \
+                   f"{flight.destination_airport}.{flight.out_date}*{flight.destination_airport}." \
+                   f"{flight.origin_airport}.{flight.return_date}"
+
+            notificationmanager.send_emails(emails, message, link)
+
     except AttributeError as error:
         print(error)
-        #
-        # print(f"{flight.origin_city}'s flight is cheaper at price ₤{flight.price}")
-        # print("Send notification with relevant details.")
+

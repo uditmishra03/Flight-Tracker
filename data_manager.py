@@ -2,6 +2,7 @@ import os
 import requests
 
 SHEET_ENDPOINT = os.environ.get("SHEET_ENDPOINT")
+USERS_SHEET_ENDPOINT = "https://api.sheety.co/3035a5e901f624a4258bcdb560c3d9a3/flightDeals/users"
 
 
 class DataManager:
@@ -23,8 +24,11 @@ class DataManager:
             }
             update_endpoint = f"{SHEET_ENDPOINT}/{each['id']}"
             response = requests.put(url=update_endpoint, json=new_data)
-            # print(response.text)
+            print(response.text)
 
-    # def get_threshold_price(self):
-    #     for each in self.destination_data:
-    #         threshold_price = self.destination_data[]
+    def get_customer_emails(self):
+        customers_endpoint = USERS_SHEET_ENDPOINT
+        response = requests.get(url=customers_endpoint)
+        data = response.json()
+        self.customer_data = data["users"]
+        return self.customer_data
